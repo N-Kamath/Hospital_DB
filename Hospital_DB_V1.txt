@@ -1,0 +1,263 @@
+
+alter session set "_ORACLE_SCRIPT"=true;
+
+CREATE USER Hospital IDENTIFIED BY qwerty;
+GRANT ALL PRIVILEGES TO Hospital;
+
+
+CREATE TABLE Doctor(
+  DoctorID     INTEGER      NOT NULL,
+  DoctorFName  VARCHAR2(25),
+  DoctorLName  VARCHAR2(25),
+  DDOB         DATE,
+  DOCLicenseID VARCHAR2(20) NOT NULL,
+  ShiftID      INTEGER      NOT NULL,
+  Constraint Doctor_PK1 Primary Key (DoctorID),
+  Constraint Doctor_FK1 Foreign Key (ShiftID) references Shift (ShiftID),
+  Constraint Doctor_FK2 Foreign Key (DOCLicenseID) references DocLicense (DOCLicenseID)
+);
+
+Alter Table Doctor ADD DEmail VARCHAR2(20);
+
+CREATE TABLE Shift(
+  ShiftID      INTEGER      NOT NULL,
+  ShiftName  VARCHAR2(30),
+  StartTime  VARCHAR2(25),
+  EndTime    VARCHAR2(25),
+  Constraint Shift_PK1 Primary Key (ShiftID)  
+);
+
+CREATE TABLE DocLicense(
+  DOCLicenseID  VARCHAR2(20)  NOT NULL,
+  IssuedState   VARCHAR2(20),
+  ObtainedDate  DATE,
+  Constraint DocLicense_PK1 Primary Key (DOCLicenseID)
+);
+
+
+CREATE TABLE Department(
+  DeptID     VARCHAR2(20)     NOT NULL,
+  DeptName   Varchar2(30),
+  DeptHead   Varchar2(30),
+  Constraint Department_PK1 Primary Key (DeptID)
+);
+
+CREATE TABLE Specialization(
+  SID         VARCHAR2(20)       NOT NULL,
+  SName       Varchar2(20),
+  Description Varchar2(100),
+  Constraint Specialization_PK1 Primary Key (SID)
+);
+
+CREATE TABLE Patient(
+  PatientID   VARCHAR2(20)      NOT NULL,
+  FirstName   VARCHAR2(30),
+  LastName    VARCHAR2(30),
+  DOB         DATE,
+  Gender      VARCHAR2(25),
+  Email       VARCHAR2(30),
+  Phone       INTEGER,
+  Address     VARCHAR2(50),
+  SSN		  VARCHAR2(15),
+  CovidStatus VARCHAR2(15),
+  Constraint Patient_PK1 Primary Key (PatientID)  
+);
+
+CREATE TABLE Insurance(
+  InsuranceID VARCHAR2(20)   NOT NULL,
+  ValidFrom   DATE,
+  ValidTo     DATE,
+  PatientID   VARCHAR2(20)   NOT NULL,
+  Constraint Insurance_PK1 Primary Key (InsuranceID),
+  Constraint Insurance_FK2 Foreign Key (PatientID) references Patient (PatientID)  
+);
+
+
+CREATE TABLE Nurse(
+  NurseID     VARCHAR2(20)     NOT NULL,
+  NurseFname  VARCHAR2(30),
+  NurseLname  VARCHAR2(30),
+  NAge        INTEGER,
+  DeptID      VARCHAR2(20)     NOT NULL,
+  SID         VARCHAR2(20)     NOT NULL,
+  ShiftID     INTEGER          NOT NULL,
+  Constraint Nurse_PK1 Primary Key (NurseID),
+  Constraint Nurse_FK1 Foreign Key (ShiftID) references Shift (ShiftID),
+  Constraint Nurse_FK2 Foreign Key (SID) references Specialization (SID),
+  Constraint Nurse_FK3 Foreign Key (DeptID) references Department (DeptID)
+);
+
+
+CREATE TABLE RoomType(
+  RoomTypeID     VARCHAR2(20)     NOT NULL,
+  RoomTypeName   VARCHAR2(30),
+  Constraint RoomType_PK1 Primary Key (RoomTypeID)
+);
+
+CREATE TABLE Rooms(
+  RoomID       VARCHAR2(20)     NOT NULL,
+  RoomTypeID   VARCHAR2(30)     NOT NULL,
+  RoomLocation VARCHAR2(30),
+  Availability VARCHAR2(30),
+  Constraint Rooms_PK1 Primary Key (RoomID),
+  Constraint Rooms_FK1 Foreign Key (RoomTypeID) references RoomType (RoomTypeID)
+);
+
+CREATE TABLE Procedure(
+  ProcedureID       VARCHAR2(20)     NOT NULL,
+  PName				VARCHAR2(20),
+  NurseID           VARCHAR2(20)     NOT NULL,
+  RoomID            VARCHAR2(20)     NOT NULL,
+  PDescription      VARCHAR2(100),
+  StartTime         TIMESTAMP,
+  EndTime           TIMESTAMP,
+  Constraint Procedure_PK1 Primary Key (ProcedureID),
+  Constraint Procedure_FK1 Foreign Key (NurseID) references Nurse (NurseID),
+  Constraint Procedure_FK2 Foreign Key (RoomID) references Rooms (RoomID)
+);
+
+CREATE TABLE Appointment(
+  AID        int     NOT NULL,
+  PatientID  VARCHAR2(20)     NOT NULL,
+  DoctorID   INTEGER          NOT NULL,
+  RoomID     VARCHAR2(20)     NOT NULL,
+  StartTime  TIMESTAMP,
+  EndTime    TIMESTAMP,
+  Diagnosis  VARCHAR2(100),
+  Constraint Appointment_PK1 Primary Key (AID),
+  Constraint Appointment_FK1 Foreign Key (PatientID) references Patient (PatientID),
+  Constraint Appointment_FK2 Foreign Key (DoctorID) references Doctor (DoctorID),
+  Constraint Appointment_FK3 Foreign Key (RoomID) references Rooms (RoomID)
+);
+
+
+CREATE TABLE Qualification(
+  QID      VARCHAR2(20)     NOT NULL,
+  QName    VARCHAR2(30),
+  QualOn   DATE,
+  Constraint Qualification_PK1 Primary Key (QID)
+);
+
+CREATE TABLE Labtest(
+  LabtestID       VARCHAR2(20)     NOT NULL,
+  TestName        VARCHAR2(30),
+  TestDescription VARCHAR2(100),
+  TestPrice       INTEGER,
+  Constraint Labtest_PK1 Primary Key (LabtestID)
+);
+
+CREATE TABLE HospitalStaff(
+  StaffID     VARCHAR2(20)     NOT NULL,
+  StaffFName  VARCHAR2(30),
+  StaffLName  VARCHAR2(30),
+  SDOB        DATE,
+  SSSN        VARCHAR2(15),
+  ShiftID     INTEGER         NOT NULL,
+  Constraint HospitalStaff_PK1 Primary Key (StaffID),
+  Constraint HospitalStaff_FK1 Foreign Key (ShiftID) references Shift (ShiftID)
+);
+
+
+CREATE TABLE PatientRecords(
+  PatientID    VARCHAR2(20)     NOT NULL,
+  ProcedureID  VARCHAR2(20)     NOT NULL,
+  AID          INT     NOT NULL,
+  DoctorsRemarks VARCHAR2(20),
+  Constraint PatientRecords_PK1 Primary Key (PatientID,ProcedureID,AID),
+  Constraint PatientRecords_FK1 Foreign Key (PatientID) references Patient (PatientID),
+  Constraint PatientRecords_FK2 Foreign Key (ProcedureID) references Procedure (ProcedureID),
+  Constraint PatientRecords_FK3 Foreign Key (AID) references Appointment (AID)
+);
+
+
+CREATE TABLE ProcedureDoc(
+  DoctorID     INTEGER         NOT NULL,
+  ProcedureID  VARCHAR2(20)    NOT NULL,
+  Constraint ProcedureDoc_PK1 Primary Key (DoctorID,ProcedureID),
+  Constraint ProcedureDoc_FK1 Foreign Key (DoctorID) references Doctor (DoctorID),
+  Constraint ProcedureDoc_FK2 Foreign Key (ProcedureID) references Procedure (ProcedureID)
+);
+
+CREATE TABLE PatientProcedure(
+  PatientID     VARCHAR2(20)  NOT NULL,
+  ProcedureID   VARCHAR2(20)  NOT NULL,
+  Constraint PatientProcedure_PK1 Primary Key (PatientID,ProcedureID),
+  Constraint PatientProcedure_FK1 Foreign Key (PatientID) references Patient (PatientID),
+  Constraint PatientProcedure_FK2 Foreign Key (ProcedureID) references Procedure (ProcedureID)
+);
+
+CREATE TABLE DocDept(
+  DeptID     VARCHAR2(20)  NOT NULL,
+  DoctorID   INTEGER       NOT NULL,
+  Constraint DocDept_PK1 Primary Key (DoctorID,DeptID),
+  Constraint DocDept_FK1 Foreign Key (DeptID) references Department (DeptID),
+  Constraint DocDept_FK2 Foreign Key (DoctorID) references Doctor (DoctorID)
+);
+
+CREATE TABLE DocQualification(
+  QID        VARCHAR2(20)  NOT NULL,
+  DoctorID   INTEGER       NOT NULL,
+  Constraint DocQualification_PK1 Primary Key (DoctorID,QID),
+  Constraint DocQualification_FK1 Foreign Key (QID) references Qualification (QID),
+  Constraint DocQualification_FK2 Foreign Key (DoctorID) references Doctor (DoctorID)
+);
+
+CREATE TABLE DocSpec(
+  SID        VARCHAR2(20)  NOT NULL,
+  DoctorID   INTEGER       NOT NULL,
+  Constraint DocSpec_PK1 Primary Key (DoctorID,SID),
+  Constraint DocSpec_FK1 Foreign Key (SID) references Specialization (SID),
+  Constraint DocSpec_FK2 Foreign Key (DoctorID) references Doctor (DoctorID)
+);
+
+CREATE TABLE AppointmentLab(
+  AID        int  NOT NULL,
+  LabtestID  VARCHAR2(20)  NOT NULL,
+  Constraint AppointmentLab_PK1 Primary Key (AID,LabtestID),
+  Constraint AppointmentLab_FK1 Foreign Key (AID) references Appointment (AID),
+  Constraint AppointmentLab_FK2 Foreign Key (LabtestID) references Labtest (LabtestID)
+);
+
+
+alter table patient modify address varchar2(200);
+
+alter table patient modify covidstatus varchar2(100);
+
+alter table labtest modify testdescription varchar2(500);
+
+alter table labtest modify testname varchar2(200);
+
+alter table specialization add DEPTID VARCHAR2(100);
+
+alter table specialization add constraint specialization_FK1 Foreign Key (DEPTID) references department (DEPTID);
+
+alter table specialization modify sname varchar2(200);
+
+alter table specialization modify description varchar2(500);
+
+alter table qualification drop column QUALON;
+
+alter table qualification add QFName varchar2(100);
+
+alter table nurse drop column Nage;
+
+alter table nurse add DOB date;
+
+alter table doctor modify demail varchar2(200);
+
+alter table insurance drop column PATIENTID;
+
+alter table patient add InsuranceID varchar2(200);
+
+alter table patient add constraint  Patient_FK1 Foreign Key (INSURANCEID) references insurance (INSURANCEID);
+
+truncate table patient;
+
+
+alter table procedure drop column PDESCRIPTION;
+
+alter table procedure drop column endtime;
+
+alter table procedure drop column starttime;
+
+alter table procedure add PDate timestamp;
