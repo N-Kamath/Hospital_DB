@@ -1,0 +1,49 @@
+Below are the entities identified to build the hospital management database.
+
+Patient, Doctor, Department, Nurse, Appointment, Hospital Staff, Shift, Rooms, Room Type, Procedure, Lab Test, Insurance
+
+1. Patient and Doctor: We assume that a doctor can have many patients (1:M) (optional), and a patient can consult many doctors (1:M).As a result, the cardinality and constraints become (M Optional; N Optional).
+
+2. Patient and Appointment: We assume that a patient has the ability to schedule multiple appointments (1:M) (Optional) but an appointment will be specific to a single patient (1:1) (mandatory), so together the cardinality and constraints become (M Optional: 1 Mandatory).
+
+3. Patient and Insurance: We assume that a patient can have only one insurance or no insurance; hence, the cardinality and constraints are (1 mandatory and 1 optional).
+
+4. Doctor and Shift: We assume that a doctor will have only one shift, and one shift can be applied to multiple doctors, so together the cardinality and constraints become (M mandatory: 1 mandatory).
+
+
+5. Nurse and Shift: We assume that a nurse will have only one shift, and one shift can be applied to multiple nurses, so together the cardinality and constraints become (M mandatory: 1 mandatory).
+ 
+
+6. Hospital staff and shift: We assume that a hospital staff will have only one shift, and one shift can be applied to multiple hospital staff, so together the cardinality and constraints become (M mandatory: 1 mandatory).
+
+7. Doctor and Department: We assume that a doctor can be a part of multiple departments (1:M) (mandatory), and a department can have multiple doctors (1:M). As a result, the cardinality and constraints are (M required; N optional).
+
+8. Nurse and Department: We assume that a nurse can be a part of only one department (1:1) (mandatory), and a department can have multiple nurses (1:M)(mandatory), so together the cardinality and constraints become (1 mandatory: M mandatory).
+
+9. Procedure and Room: We assume a procedure can have only one room allocated, and a single room can be allocated for only one procedure, so together the cardinality and constraints become (1 mandatory, 1 optional).
+
+
+10. Procedure and Nurse: We assume that a procedure should have at least one nurse, but can have multiple nurses, and a nurse can be part of no procedure or one procedure at most, so together the cardinality and constraints become (1 optional, M mandatory).
+
+11. Room and Room Type: We assume that one room can have multiple room types but should have at least one room type, and one room type should be part of only one room, so together the cardinality and constraints become (1 mandatory, M mandatory).
+
+12. We assume that a lab test may or may not be part of an appointment, and that an appointment may or may not include multiple lab tests, so the cardinality and constraints become (M Optional; N Optional).
+
+13. Doctor and Appointment: We assume that a doctor can be part of no appointments or multiple appointments, and an appointment should have one doctor only, so together the cardinality and constraints become (1 mandatory, M optional).
+
+14. Appointment and Room: We assume that a room can have no appointments or one appointment, and one appointment should have only a single room, so the cardinality and constraints become (1 mandatory, 1 optional).
+
+
+We create the below associative entities to allow for an intermediary 1:M relationship in order to better
+M:N relationships are represented.
+
+AppointmentLab, PatientProcedure, ProcedureDoc, and DocDept
+
+Normalization
+
+1. We check the tables for multivalued attributes and identify the primary keys to bring it to 1NF.
+2. Then we convert this table to 2NF by removing any partial functional dependencies.
+3. We can convert the table to 3NF by removing any transitive dependencies.
+4. We convert the table to BCNF by making every determinant a candidate key or multiple candidate keys where each key has only one attribute.
+
+We have created the ERD shown below after normalization.
